@@ -1,6 +1,5 @@
 import Image from "next/image";
 import image1 from "@/public/about-1.jpg";
-import image2 from "@/public/about-2.jpg";
 
 export const metadata = {
   title: "About",
@@ -8,7 +7,7 @@ export const metadata = {
 
 export default function Page() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-5 gap-x-24 gap-y-32 text-lg items-center">
+    <div className="grid grid-cols-5 gap-x-24 gap-y-32 text-lg items-center">
       <div className="col-span-3">
         <h1 className="text-4xl mb-10 text-accent-400 font-medium">
           Welcome to The Wild Oasis
@@ -40,6 +39,8 @@ export default function Page() {
         <Image
           src={image1}
           alt="Family sitting around a fire pit in front of cabin"
+          placeholder="blur"
+          quality={80}
         />
       </div>
 
