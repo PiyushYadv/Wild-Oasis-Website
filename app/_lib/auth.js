@@ -20,17 +20,18 @@ const authConfig = {
           await createGuest({ email: user.email, fullName: user.name });
         return true;
       } catch (error) {
+        console.log("ERRORRRRRR", error);
         return false;
       }
     },
-    async session({ session, user }) {
-      const guest = await getGuest(user.email);
+    async session({ session, token }) {
+      const guest = await getGuest(session.user.email);
       // session.user.id = guest.id;
       return {
         ...session,
         user: {
           ...session.user,
-          id: guest.id,
+          guestId: guest.id,
         },
       };
     },
