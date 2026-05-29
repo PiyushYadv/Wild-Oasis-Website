@@ -18,11 +18,11 @@ export default async function CabinList({ filter }) {
   }
   if (filter === "medium") {
     displayedCabins = cabins.filter(
-      (cabin) => cabin.maxCapacity > 3 && cabin.maxCapacity <= 7,
+      (cabin) => cabin.maxCapacity >= 4 && cabin.maxCapacity <= 7,
     );
   }
   if (filter === "large") {
-    displayedCabins = cabins.filter((cabin) => cabin.maxCapacity > 7);
+    displayedCabins = cabins.filter((cabin) => cabin.maxCapacity >= 8);
   }
 
   return (

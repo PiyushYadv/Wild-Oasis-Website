@@ -26,7 +26,9 @@ export default function RootLayout({ children }) {
             <ReservationProvider>{children}</ReservationProvider>
           </main>
         </div>
-        <footer>Copyright by the Wild Oasis</footer>
+        <footer>
+          Copyright &copy; Piyush Yadav {new Date().getFullYear()}
+        </footer>
       </body>
     </html>
   );

@@ -1,7 +1,12 @@
 "use server";
 
 import { auth, signIn, signOut } from "@/app/_lib/auth";
+import {
+  getBookedDatesByCabinId,
+  getBookings,
+} from "@/app/_lib/data-service";
 import { supabase } from "@/app/_lib/supabase";
+import { differenceInDays, isWithinInterval } from "date-fns";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -34,6 +39,54 @@ export async function updateGuest(formData) {
   }
 
   revalidatePath("/account/profile");
+}
+
+export async function createBooking(bookingData, formData) {
+  const session = await auth();
+
+  if (!session) {
+    throw new Error("You must be logged in");
+  }
+
+  const numNights = differenceInDays(bookingData.endDate, bookingData.startDate);
+
+  if (!bookingData.startDate || !bookingData.endDate || numNights <= 0) {
+    throw new Error("Please select a valid date range");
+  }
+
+  const bookedDates = await getBookedDatesByCabinId(bookingData.cabinId);
+  const hasOverlap = bookedDates.some((date) =>
+    isWithinInterval(date, {
+      start: bookingData.startDate,
+      end: bookingData.endDate,
+    }),
+  );
+
+  if (hasOverlap) {
+    throw new Error("Selected dates are already booked");
+  }
+
+  const newBooking = {
+    ...bookingData,
+    numNights,
+    guestId: session.user.guestId,
+    numGuests: Number(formData.get("numGuests")),
+    observations: formData.get("observations").slice(0, 1000),
+    extrasPrice: 0,
+    totalPrice: bookingData.cabinPrice,
+    isPaid: false,
+    hasBreakfast: false,
+    status: "unconfirmed",
+  };
+
+  const { error } = await supabase.from("bookings").insert([newBooking]);
+
+  if (error) {
+    throw new Error("Booking could not be created");
+  }
+
+  revalidatePath(`/cabins/${bookingData.cabinId}`);
+  redirect(`/cabins/thankyou`);
 }
 
 export async function deleteBooking(bookingId) {
@@ -105,35 +158,6 @@ export async function updateBooking(formData) {
 
   // 7) Redirecting
   redirect("/account/reservations");
-}
-
-export async function createBooking(bookingData, formData) {
-  const session = await auth();
-
-  if (!session) {
-    throw new Error("You must be logged in");
-  }
-
-  const newBooking = {
-    ...bookingData,
-    guestId: session.user.guestId,
-    numGuests: Number(formData.get("numGuests")),
-    observations: formData.get("observations").slice(0, 1000),
-    extrasPrice: 0,
-    totalPrice: bookingData.cabinPrice,
-    isPaid: false,
-    hasBreakfast: false,
-    status: "unconfirmed",
-  };
-
-  const { error } = await supabase.from("bookings").insert(newBooking);
-
-  if (error) {
-    throw new Error("Booking could not be created");
-  }
-
-  revalidatePath(`/cabins/${bookingData.cabinId}`);
-  redirect(`/cabins/thankyou`);
 }
 
 export async function signInAction() {

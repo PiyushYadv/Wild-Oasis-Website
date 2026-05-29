@@ -12,7 +12,7 @@ export const revalidate = 3600; // 1 hr
 
 export default async function Page({ searchParams }) {
   const params = await searchParams;
-  const filter = params.capacity || "all";
+  const filter = params?.capacity ?? "all";
 
   return (
     <div>

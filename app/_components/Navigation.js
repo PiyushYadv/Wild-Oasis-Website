@@ -37,7 +37,7 @@ export default async function Navigation() {
                 className="w-8 h-8 rounded-full"
                 referrerPolicy="no-referrer"
               />
-              <span>{session?.user?.name ?? "User"}</span>
+              <span>Guest area</span>
             </Link>
           ) : (
             <Link

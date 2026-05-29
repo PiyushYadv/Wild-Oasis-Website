@@ -10,15 +10,16 @@ function ReservationForm({ cabin, user }) {
   const { range, resetRange } = useReservation();
   const { maxCapacity, regularPrice, discount, id } = cabin;
 
-  const start = range.from;
-  const end = range.to;
+  const startDate = range.from;
+  const endDate = range.to;
 
-  const numNights = differenceInDays(end, start);
+  const numNights = differenceInDays(endDate, startDate);
   const cabinPrice = numNights * (regularPrice - discount);
+  const hasValidRange = startDate && endDate && numNights > 0;
 
   const bookingData = {
-    start,
-    end,
+    startDate,
+    endDate,
     numNights,
     cabinPrice,
     cabinId: id,
@@ -83,7 +84,7 @@ function ReservationForm({ cabin, user }) {
         </div>
 
         <div className="flex justify-end items-center gap-6">
-          {!(startDate && endDate) ? (
+          {!hasValidRange ? (
             <p className="text-primary-300 text-base">
               Start by selecting dates
             </p>

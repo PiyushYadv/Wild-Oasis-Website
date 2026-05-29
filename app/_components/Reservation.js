@@ -5,8 +5,10 @@ import { auth } from "@/app/_lib/auth";
 import LoginMessage from "@/app/_components/LoginMessage";
 
 async function Reservation({ cabin }) {
-  const settings = await getSettings();
-  const bookedDates = await getBookedDatesByCabinId(cabin.id);
+  const [settings, bookedDates] = await Promise.all([
+    getSettings(),
+    getBookedDatesByCabinId(cabin.id),
+  ]);
 
   const session = await auth();
 
@@ -18,7 +20,7 @@ async function Reservation({ cabin }) {
         cabin={cabin}
       />
       {session?.user ? (
-        <ReservationForm cabin={cabin} user={session?.user} />
+        <ReservationForm cabin={cabin} user={session.user} />
       ) : (
         <LoginMessage />
       )}

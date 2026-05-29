@@ -23,23 +23,36 @@ function isAlreadyBooked(range, datesArr) {
 function DateSelector({ settings, cabin, bookedDates }) {
   const { range, setRange, resetRange } = useReservation();
 
-  const displayRange = isAlreadyBooked(range, bookedDates) ? {} : range;
-
   const { regularPrice, discount } = cabin;
-  const numNights = differenceInDays(displayRange.to, displayRange.from);
+  const numNights =
+    range.from && range.to ? differenceInDays(range.to, range.from) : 0;
   const cabinPrice = numNights * (regularPrice - discount);
 
   const { minBookingLength, maxBookingLength } = settings;
+
+  function handleSelect(selectedRange, selectedDay) {
+    if (!selectedRange) {
+      resetRange();
+      return;
+    }
+
+    if (isAlreadyBooked(selectedRange, bookedDates)) {
+      setRange({ from: selectedDay, to: undefined });
+      return;
+    }
+
+    setRange(selectedRange);
+  }
 
   return (
     <div className="flex flex-col justify-between">
       <DayPicker
         className="pt-12 place-self-center"
         mode="range"
-        onSelect={setRange}
-        selected={displayRange}
+        onSelect={handleSelect}
+        selected={range}
         min={minBookingLength + 1}
-        max={maxBookingLength}
+        max={maxBookingLength + 1}
         fromMonth={new Date()}
         fromDate={new Date()}
         toYear={new Date().getFullYear() + 5}
